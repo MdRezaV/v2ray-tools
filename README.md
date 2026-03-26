@@ -246,7 +246,7 @@ Contributions are welcome. Please open an issue or pull request.
 
 ## Acknowledgements
 
-- [python-v2ray](https://github.com/xtls/python-v2ray) for V2Ray configuration parsing
+- [python-v2ray](https://github.com/arshiacomplus/python_v2ray) for V2Ray configuration parsing
 - [Rich](https://github.com/Textualize/rich) for terminal output formatting
 - [httpx](https://www.python-httpx.org/) for asynchronous HTTP requests
 - [MaxMind](https://www.maxmind.com/) for GeoLite2 data
