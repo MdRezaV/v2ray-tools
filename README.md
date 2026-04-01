@@ -6,10 +6,10 @@ A set of command-line tools for managing V2Ray configurations – downloading su
 
 | Script | Purpose |
 |--------|---------|
-| **v2down.py** | Download V2Ray subscription URLs (or any text‑based subscription) with resume, concurrency, and rich progress display. |
-| **v2cidr.py** | Organize V2Ray configurations by country using MaxMind GeoLite2 database or custom CIDR range files. |
-| **v2find.py** | Filter V2Ray configurations by server address patterns (wildcards, IP ranges, domains) with optional DNS resolution. |
-| **ip2cc.py** | Map IP addresses to countries using CIDR range files. |
+| **v2down** | Download V2Ray subscription URLs (or any text‑based subscription) with resume, concurrency, and rich progress display. |
+| **v2cidr** | Organize V2Ray configurations by country using MaxMind GeoLite2 database or custom CIDR range files. |
+| **v2find** | Filter V2Ray configurations by server address patterns (wildcards, IP ranges, domains) with optional DNS resolution. |
+| **ip2cc** | Map IP addresses to countries using CIDR range files. |
 | **v2conv** | Convert Telegram SOCKS5/MTProto proxy links into v2ray-compatible URLs. Native v2ray schemes pass through unchanged. |
 
 ---
@@ -26,26 +26,40 @@ A set of command-line tools for managing V2Ray configurations – downloading su
 pip install httpx rich tenacity python-v2ray pycountry maxminddb pyperclip
 ```
 
-For `ip2cc.py`, the dependencies are `pycountry` and `rich` (both optional, but recommended).
+For `ip2cc`, the dependencies are `pycountry` and `rich` (both optional, but recommended).
 
 For `v2conv` clipboard functionality on Linux:
 - **X11**: Install `xclip` or `xsel` (`sudo pacman -S xclip` or `sudo apt install xclip`)
 - **Wayland**: Install `wl-clipboard` (`sudo pacman -S wl-clipboard` or `sudo apt install wl-clipboard`)
 - **Cross-platform fallback**: `pyperclip` (installed above) handles clipboard access when native tools aren't available.
 
-*Note: `maxminddb` is required only for `v2cidr.py` when using the MMDB mode.  
-`python-v2ray` is required for `v2cidr.py` and `v2find.py`.*
+*Note: `maxminddb` is required only for `v2cidr` when using the MMDB mode.  
+`python-v2ray` is required for `v2cidr` and `v2find`.*
+
+### Make scripts executable (recommended)
+
+```bash
+chmod +x v2down v2cidr v2find ip2cc v2conv
+```
+
+After making them executable, you can run them directly without `python`:
+
+```bash
+./v2down --input urls.txt
+# Or add to PATH for global access:
+sudo cp v2down v2cidr v2find ip2cc v2conv /usr/local/bin/
+```
 
 ---
 
 ## Usage
 
-### 1. `v2down.py` – Download V2Ray subscriptions
+### 1. `v2down` – Download V2Ray subscriptions
 
 Downloads each URL from the input file to a numbered `.txt` file. Supports parallel downloads, partial resume, and robots.txt.
 
 ```bash
-python v2down.py --input urls.txt --workers 4 --output-dir downloads/
+v2down --input urls.txt --workers 4 --output-dir downloads/
 ```
 
 **Options**
@@ -66,18 +80,18 @@ python v2down.py --input urls.txt --workers 4 --output-dir downloads/
 Download from multiple subscriptions with 8 workers, respecting robots.txt, and skipping existing files:
 
 ```bash
-python v2down.py -i subs.txt -w 8 --skip-existing --respect-robots
+v2down -i subs.txt -w 8 --skip-existing --respect-robots
 ```
 
 ---
 
-### 2. `v2cidr.py` – Organize configurations by country
+### 2. `v2cidr` – Organize configurations by country
 
 Reads V2Ray URIs from text files, resolves domains, and writes each configuration to a file named `{COUNTRY_CODE}.{COUNTRY_NAME}.txt`.  
 Two geolocation methods are available: MaxMind GeoLite2 database (default) or CIDR range files.
 
 ```bash
-python v2cidr.py configs/*.txt --use-mmdb --mmdb-file GeoLite2-Country.mmdb -w 8
+v2cidr configs/*.txt --use-mmdb --mmdb-file GeoLite2-Country.mmdb -w 8
 ```
 
 **Options**
@@ -109,17 +123,17 @@ The script expects a GeoLite2 Country database in MaxMind DB format. You can dow
 Process all `.txt` files, use CIDR ranges, skip duplicates, with 8 threads:
 
 ```bash
-python v2cidr.py *.txt --use-cidr --cidr-dir cidr/ -s -w 8
+v2cidr *.txt --use-cidr --cidr-dir cidr/ -s -w 8
 ```
 
 ---
 
-### 3. `v2find.py` – Filter configurations by address pattern
+### 3. `v2find` – Filter configurations by address pattern
 
 Searches for V2Ray configurations whose server address matches a given pattern (wildcards allowed). Optionally resolves domains to IPs to match against IP patterns.
 
 ```bash
-python v2find.py *.txt -addr "127.0.*" -o found.txt
+v2find *.txt -addr "127.0.*" -o found.txt
 ```
 
 **Options**
@@ -144,17 +158,17 @@ python v2find.py *.txt -addr "127.0.*" -o found.txt
 Find all configurations using Cloudflare IPs and save to file:
 
 ```bash
-python v2find.py configs/*.txt -addr "104.16.*" -o cloudflare.txt
+v2find configs/*.txt -addr "104.16.*" -o cloudflare.txt
 ```
 
 ---
 
-### 4. `ip2cc.py` – Map IP addresses to countries
+### 4. `ip2cc` – Map IP addresses to countries
 
 Maps IP addresses to country codes using CIDR range files. Supports batch lookups, various output formats, reverse lookups, and exporting CIDR ranges.
 
 ```bash
-python ip2cc.py 8.8.8.8
+ip2cc 8.8.8.8
 ```
 
 **Options**
@@ -181,32 +195,32 @@ Each file contains one CIDR range per line. Comments (lines starting with `#`) a
 
 Lookup a single IP:
 ```bash
-python ip2cc.py 8.8.8.8
+ip2cc 8.8.8.8
 ```
 
 Lookup multiple IPs:
 ```bash
-python ip2cc.py 8.8.8.8 1.1.1.1 2001:4860:4860::8888
+ip2cc 8.8.8.8 1.1.1.1 2001:4860:4860::8888
 ```
 
 Read IPs from a file and output JSON:
 ```bash
-python ip2cc.py --input-file ips.txt --output-format json
+ip2cc --input-file ips.txt --output-format json
 ```
 
 Show database statistics:
 ```bash
-python ip2cc.py stats
+ip2cc stats
 ```
 
 Show sample IPs for United States:
 ```bash
-python ip2cc.py --reverse US --limit 5
+ip2cc --reverse US --limit 5
 ```
 
 Export all CIDR ranges for Japan:
 ```bash
-python ip2cc.py --export JP > jp_cidrs.txt
+ip2cc --export JP > jp_cidrs.txt
 ```
 
 ---
@@ -223,19 +237,19 @@ Convert Telegram SOCKS5/MTProto proxy links into v2ray-compatible URLs. Native v
 **Basic Usage:**
 ```bash
 # Convert a single Telegram SOCKS5 proxy URL
-python v2conv "https://t.me/socks?server=proxy.example.com&port=1080"
+v2conv "https://t.me/socks?server=proxy.example.com&port=1080"
 
 # Read from clipboard
-python v2conv -c
+v2conv -c
 
 # Watch clipboard continuously (Ctrl+C to stop)
-python v2conv -w -o configs.txt
+v2conv -w -o configs.txt
 
 # Batch convert from file
-python v2conv proxies.txt -o out.txt
+v2conv proxies.txt -o out.txt
 
 # Quiet mode for scripting (output only converted URLs)
-python v2conv -c -q | grep -v '^#'
+v2conv -c -q | grep -v '^#'
 ```
 
 **Options**
@@ -262,23 +276,23 @@ python v2conv -c -q | grep -v '^#'
 
 Convert a Telegram SOCKS5 proxy with credentials:
 ```bash
-python v2conv "https://t.me/socks?server=proxy.example.com&port=1080&user=alice&pass=secret123"
+v2conv "https://t.me/socks?server=proxy.example.com&port=1080&user=alice&pass=secret123"
 # Output: socks://YWxpY2U6c2VjcmV0MTIz@proxy.example.com:1080#proxy.example.com
 ```
 
 Batch convert from clipboard, save to file:
 ```bash
-python v2conv -c -o v2ray_configs.txt
+v2conv -c -o v2ray_configs.txt
 ```
 
 Watch clipboard continuously and append results:
 ```bash
-python v2conv -w -o collected_configs.txt -a
+v2conv -w -o collected_configs.txt -a
 ```
 
 Allow private/local IPs (use with caution):
 ```bash
-python v2conv -c --allow-local
+v2conv -c --allow-local
 ```
 
 **Exit Codes:**
@@ -291,22 +305,22 @@ python v2conv -c --allow-local
 
 1. **Download** subscriptions:
    ```bash
-   python v2down.py -i my-subs.txt -w 8 -o raw/
+   v2down -i my-subs.txt -w 8 -o raw/
    ```
 
 2. **Convert** any Telegram proxy links found:
    ```bash
-   python v2conv raw/*.txt -o converted.txt
+   v2conv raw/*.txt -o converted.txt
    ```
 
 3. **Filter** by address (e.g., keep only servers with IPs in US range):
    ```bash
-   python v2find.py converted.txt -addr "192.168.*" -o filtered.txt
+   v2find converted.txt -addr "192.168.*" -o filtered.txt
    ```
 
 4. **Sort by country** using CIDR files:
    ```bash
-   python v2cidr.py filtered.txt --use-cidr --cidr-dir cidr/ -s -w 8
+   v2cidr filtered.txt --use-cidr --cidr-dir cidr/ -s -w 8
    ```
 
 Now you have country‑organized, v2ray-compatible configurations ready to use.
