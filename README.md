@@ -36,20 +36,6 @@ For `v2conv` clipboard functionality on Linux:
 *Note: `maxminddb` is required only for `v2cidr` when using the MMDB mode.  
 `python-v2ray` is required for `v2cidr` and `v2find`.*
 
-### Make scripts executable (recommended)
-
-```bash
-chmod +x v2down v2cidr v2find ip2cc v2conv
-```
-
-After making them executable, you can run them directly without `python`:
-
-```bash
-./v2down --input urls.txt
-# Or add to PATH for global access:
-sudo cp v2down v2cidr v2find ip2cc v2conv /usr/local/bin/
-```
-
 ---
 
 ## Usage
